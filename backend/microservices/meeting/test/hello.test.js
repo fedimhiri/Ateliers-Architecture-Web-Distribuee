@@ -2,6 +2,7 @@
 const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 const app = require('../src/app');
+const { name, version } = require('../package.json');
 
 let server;
 let baseUrl;
@@ -18,6 +19,18 @@ test('GET /api/meetings/hello returns the greeting', async () => {
   const res = await fetch(`${baseUrl}/api/meetings/hello`);
   assert.equal(res.status, 200);
   assert.deepEqual(await res.json(), { message: "hello I'm microservice meeting" });
+});
+
+test('GET /health returns UP', async () => {
+  const res = await fetch(`${baseUrl}/health`);
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { status: 'UP' });
+});
+
+test('GET /info returns the package name and version', async () => {
+  const res = await fetch(`${baseUrl}/info`);
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { name, version });
 });
 
 test('GET /v3/api-docs returns the OpenAPI spec', async () => {

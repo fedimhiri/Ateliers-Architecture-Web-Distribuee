@@ -15,24 +15,24 @@ mvn spring-boot:run
 ## Endpoints
 | Method | Path | Description |
 |---|---|---|
-| GET | /api/candidates | List candidates |
-| GET | /api/candidates/{id} | Get one candidate |
-| POST | /api/candidates | Create candidate (address optional, created with it) |
-| PUT | /api/candidates/{id} | Update candidate (and its address if given) |
-| DELETE | /api/candidates/{id} | Delete candidate and its address |
-| PUT | /api/candidates/{id}/address/{addressId} | Link an existing address |
-| DELETE | /api/candidates/{id}/address | Unlink the address (address is kept) |
-| GET | /api/addresses | List addresses |
-| GET | /api/addresses/{id} | Get one address |
-| POST | /api/addresses | Create address |
-| PUT | /api/addresses/{id} | Update address |
-| DELETE | /api/addresses/{id} | Delete address (unlinked from its candidate first) |
+| GET | /mic1/candidates | List candidates |
+| GET | /mic1/candidates/{id} | Get one candidate |
+| POST | /mic1/candidates | Create candidate (address optional, created with it) |
+| PUT | /mic1/candidates/{id} | Update candidate (and its address if given) |
+| DELETE | /mic1/candidates/{id} | Delete candidate and its address |
+| PUT | /mic1/candidates/{id}/address/{addressId} | Link an existing address |
+| DELETE | /mic1/candidates/{id}/address | Unlink the address (address is kept) |
+| GET | /mic1/addresses | List addresses |
+| GET | /mic1/addresses/{id} | Get one address |
+| POST | /mic1/addresses | Create address |
+| PUT | /mic1/addresses/{id} | Update address |
+| DELETE | /mic1/addresses/{id} | Delete address (unlinked from its candidate first) |
 
 Errors: 400 validation, 404 not found, 409 duplicate email / address already taken (RFC 7807 JSON).
 
 ## Example
 ```json
-POST /api/candidates
+POST /mic1/candidates
 {
   "firstname": "Badia",
   "lastname": "Abouhdid",
