@@ -5,29 +5,25 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Spring Boot -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.5</version>
+        <version>3.5.6</version>
         <relativePath/>
     </parent>
 
-    <!-- Informations du microservice -->
     <groupId>com.awd</groupId>
     <artifactId>job</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>job</name>
     <description>Job microservice - Job and Category REST API (MySQL)</description>
 
-    <!-- Versions -->
     <properties>
         <java.version>17</java.version>
-        <springdoc.version>2.5.0</springdoc.version>
-        <spring-cloud.version>2023.0.4</spring-cloud.version>
+        <springdoc.version>2.8.9</springdoc.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
     </properties>
 
-    <!-- Gestion des versions Spring Cloud -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -41,12 +37,8 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- Spring Boot Actuator -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <!-- Spring Web : API REST -->
+
+        <!-- Spring Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -71,6 +63,18 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Eureka Client -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Swagger / OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
@@ -78,20 +82,14 @@
             <version>${springdoc.version}</version>
         </dependency>
 
-        <!-- Eureka Discovery Client -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
-
-        <!-- Tests Spring Boot -->
+        <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- H2 : base en memoire pour les tests -->
+        <!-- H2 pour les tests -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
@@ -100,7 +98,6 @@
 
     </dependencies>
 
-    <!-- Configuration Maven -->
     <build>
         <plugins>
             <plugin>

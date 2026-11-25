@@ -1,101 +1,61 @@
 
 const app = require('./app');
-const { Eureka } = require('eureka-js-client');
-const pkg = require('../package.json');
+const { createEurekaClient } = require('./config/eureka');
 
-// Port du microservice Meeting
+// Port du microservice MEETING
 const PORT = Number(process.env.PORT) || 8088;
 
-// ==========================================
-// ENDPOINTS HEALTH ET INFO
-// ==========================================
+// Configuration Eureka
+const eurekaClient =
+    process.env.EUREKA_ENABLED === 'false'
+        ? null
+        : createEurekaClient(PORT);
 
-// Vérifier l'état de santé du microservice
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'UP'
-  });
-});
-
-// Afficher les informations du microservice
-app.get('/info', (req, res) => {
-  res.status(200).json({
-    name: pkg.name,
-    version: pkg.version
-  });
-});
-
-// ==========================================
-// CONFIGURATION EUREKA CLIENT
-// ==========================================
-
-const client = new Eureka({
-  instance: {
-    app: 'MEETING',
-    instanceId: `localhost:meeting:${PORT}`,
-    hostName: 'localhost',
-    ipAddr: '127.0.0.1',
-
-    port: {
-      '$': PORT,
-      '@enabled': 'true'
-    },
-
-    vipAddress: 'meeting',
-
-    // Endpoints de santé et d'information
-    healthCheckUrl: `http://localhost:${PORT}/health`,
-    statusPageUrl: `http://localhost:${PORT}/info`,
-    homePageUrl: `http://localhost:${PORT}/`,
-
-    dataCenterInfo: {
-      '@class': 'com.netflix.appinfo.InstanceInfo$DefaultDataCenterInfo',
-      name: 'MyOwn'
-    }
-  },
-
-  eureka: {
-    host: 'localhost',
-    port: 8761,
-    servicePath: '/eureka/apps/',
-    registerWithEureka: true,
-    fetchRegistry: true
-  }
-});
-
-// ==========================================
-// DEMARRAGE DU SERVEUR EXPRESS
-// ==========================================
-
+// Démarrage du serveur HTTP
 const server = app.listen(PORT, () => {
-  console.log(`Meeting running on http://localhost:${PORT}`);
-  console.log(`Swagger UI: http://localhost:${PORT}/swagger-ui`);
-  console.log(`Health: http://localhost:${PORT}/health`);
-  console.log(`Info: http://localhost:${PORT}/info`);
+  console.log(
+      `Meeting service on http://localhost:${PORT} (Swagger: /swagger-ui)`
+  );
 
-  // Enregistrer Meeting dans Eureka
-  client.start((error) => {
-    if (error) {
-      console.error('Erreur Eureka :', error);
+  if (!eurekaClient) return;
+
+  // Enregistrement dans Eureka
+  eurekaClient.start((err) => {
+    if (err) {
+      console.error(
+          'Eureka registration failed:',
+          err.message || err
+      );
     } else {
-      console.log('MEETING enregistre dans Eureka !');
+      console.log(
+          `Registered in Eureka as MEETING (localhost:meeting:${PORT})`
+      );
     }
   });
 });
 
-// ==========================================
-// ARRET PROPRE DU MICROSERVICE
-// ==========================================
+// Arrêt propre et désenregistrement Eureka
+let stopping = false;
 
-function shutdown() {
-  console.log('Arret de Meeting...');
+function shutdown(signal) {
+  if (stopping) return;
+  stopping = true;
 
-  client.stop(() => {
-    server.close(() => {
-      process.exit(0);
-    });
-  });
+  console.log(
+      `${signal} received, deregistering from Eureka...`
+  );
+
+  const close = () =>
+      server.close(() => process.exit(0));
+
+  if (eurekaClient) {
+    eurekaClient.stop(close);
+  } else {
+    close();
+  }
+
+  setTimeout(() => process.exit(0), 5000).unref();
 }
 
-process.on('SIGINT', shutdown);
-process.on('SIGTERM', shutdown);
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));

@@ -3,33 +3,17 @@ const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const openapiSpec = require('./config/swagger');
 const meetingRoutes = require('./routes/meeting.routes');
-const pkg = require('../package.json');
 
 const app = express();
+
+// ==========================================
+// 1. CONFIGURATION EXPRESS
+// ==========================================
 
 app.use(express.json());
 
 // ==========================================
-// HEALTH ET INFO - OBSERVABILITE
-// ==========================================
-
-// Verifier que le microservice fonctionne
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'UP'
-  });
-});
-
-// Afficher les informations du microservice
-app.get('/info', (req, res) => {
-  res.status(200).json({
-    name: pkg.name,
-    version: pkg.version
-  });
-});
-
-// ==========================================
-// SWAGGER DOCUMENTATION
+// 2. SWAGGER / OPENAPI
 // ==========================================
 
 app.get('/v3/api-docs', (req, res) => {
@@ -43,13 +27,38 @@ app.use(
 );
 
 // ==========================================
-// API ROUTES
+// 3. ENDPOINT HEALTH
+// ==========================================
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'UP'
+  });
+});
+
+// ==========================================
+// 4. ENDPOINT INFO
+// ==========================================
+
+app.get('/info', (req, res) => {
+  res.status(200).json({
+    app: {
+      name: 'MEETING',
+      version: '1.0.0',
+      description: 'Microservice de gestion des meetings',
+      port: Number(process.env.PORT) || 8088
+    }
+  });
+});
+
+// ==========================================
+// 5. ROUTES CRUD MEETING
 // ==========================================
 
 app.use('/api/meetings', meetingRoutes);
 
 // ==========================================
-// 404 - ROUTES INCONNUES
+// 6. GESTION DES ROUTES INCONNUES
 // ==========================================
 
 app.use((req, res) => {
@@ -61,10 +70,9 @@ app.use((req, res) => {
 });
 
 // ==========================================
-// GESTION DES ERREURS
+// 7. GESTION DES ERREURS
 // ==========================================
 
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const status = err.status || 500;
 
